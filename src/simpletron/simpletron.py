@@ -5,6 +5,8 @@ Simulador de simpletron
 Proyecto de Simulador de una computadora virtual Simpletron (SML).
 """
 
+import sys
+
 TAM_MEMORIA = 100
 MIN_VALOR = -9999
 MAX_VALOR = 9999
@@ -35,7 +37,8 @@ class Simpletron:
         self.en_ejecucion = True
 
     def cargar_programa(self):
-        """Solicita al usuario las instrucciones y datos."""
+#SOLICITA AL USUARIO LAS INTRUCIONES Y DATOSS
+
         print("*** Bienvenido al simulador Simpletron ***")
         print("*** Ingrese su programa. Cada instruccion o dato en SML ***")
         print("*** se introduce en la ubicacion de memoria adecuada.   ***")
@@ -58,6 +61,43 @@ class Simpletron:
                 direccion += 1
             else:
                 print("*** Error: la instruccion debe estar entre -9999 y +9998 ***")
+
+    def cargar_archivo(self, ruta):
+        try:
+            archivo = open(ruta, "r", encoding="utf-8")
+            lineas = archivo.readlines()
+            archivo.close()
+        except FileNotFoundError:
+            print(f"*** Error: el archivo '{ruta}' no existe ***")
+            return False
+
+        direccion = 0
+        numero_linea = 0
+        for linea in lineas:
+            numero_linea += 1
+            texto = linea.split(";")[0].strip()
+
+            if texto == "":
+                continue
+
+            try:
+                valor = int(texto)
+            except ValueError:
+                print(f"*** Error en la linea {numero_linea}: '{texto}' no es un valor valido ***")
+                return False
+
+            if valor < MIN_VALOR or valor > MAX_VALOR:
+                print(f"*** Error en la linea {numero_linea}: valor fuera de rango ***")
+                return False
+
+            if direccion >= TAM_MEMORIA:
+                print("*** Error: el programa excede la memoria ***")
+                return False
+
+            self.memoria[direccion] = valor
+            direccion += 1
+
+        return True
 
     def volcado_memoria(self):
         """Muestra el estado actual de registros y memoria completa."""
@@ -171,10 +211,13 @@ class Simpletron:
         print("*** Simpletron terminando la ejecucion ***")
         self.en_ejecucion = False
 
-
 def main():
     simulador = Simpletron()
-    simulador.cargar_programa()
+    if len(sys.argv) > 1:
+        if not simulador.cargar_archivo(sys.argv[1]):
+            return
+    else:
+        simulador.cargar_programa()
     simulador.ejecutar()
     simulador.volcado_memoria()
 
