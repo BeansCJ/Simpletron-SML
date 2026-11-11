@@ -21,6 +21,7 @@ SUMAR = 30
 RESTAR = 31
 DIVIDIR = 32
 MULTIPLICAR = 33
+MODULO = 34
 BIFURCAR = 40
 BIFURCAR_NEGATIVO = 41
 BIFURCAR_CERO = 42
@@ -199,6 +200,12 @@ class Simpletron:
                 self.instructionCounter = operando
         elif op == SALTO_LINEA:
             print()
+        elif op == MODULO:
+            divisor = self.memoria[operando]
+            if divisor == 0:
+                self._error_fatal("Intento de modulo entre cero")
+            else:
+                self.accumulator = self.accumulator - int(self.accumulator / divisor) * divisor
         elif op == DETENER:
             print("*** Ejecucion detenida por Simpletron ***")
             self.en_ejecucion = False
