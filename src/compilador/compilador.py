@@ -1,3 +1,5 @@
+# Compilador Simple - Carlo Emilio Caballero Robles - 3515208
+
 import os
 import re
 import sys
