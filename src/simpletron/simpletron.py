@@ -14,6 +14,7 @@ MAX_VALOR = 9999
 # Codigos de operacion SML
 LEER = 10
 ESCRIBIR = 11
+SALTO_LINEA = 12
 CARGAR = 20
 ALMACENAR = 21
 SUMAR = 30
@@ -196,6 +197,8 @@ class Simpletron:
         elif op == BIFURCAR_CERO:
             if self.accumulator == 0:
                 self.instructionCounter = operando
+        elif op == SALTO_LINEA:
+            print()
         elif op == DETENER:
             print("*** Ejecucion detenida por Simpletron ***")
             self.en_ejecucion = False
