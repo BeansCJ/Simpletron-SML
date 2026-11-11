@@ -1,0 +1,10 @@
+10 input n
+20 let r = 1
+30 let i = 1
+40 if i <= n goto 60
+50 goto 100
+60 let r = r * i
+70 let i = i + 1
+80 goto 40
+100 print r
+110 end

@@ -70,6 +70,18 @@ class PruebasCompilador(unittest.TestCase):
                 esperado = 1 if verdadero else 0
                 self.assertIn(f"Ingrese un entero: {esperado}\n*** Ejecucion detenida", salida)
 
+    def test_programa_mayor(self):
+        ruta = os.path.join(carpeta_proyecto, "programas", "simple", "mayor.simple")
+        with open(ruta, encoding="utf-8") as archivo:
+            salida = self.ejecutar_simple(archivo.read(), "7\n5\n")
+        self.assertIn("Ingrese un entero: Ingrese un entero: 7\n*** Ejecucion detenida", salida)
+
+    def test_programa_factorial(self):
+        ruta = os.path.join(carpeta_proyecto, "programas", "simple", "factorial.simple")
+        with open(ruta, encoding="utf-8") as archivo:
+            salida = self.ejecutar_simple(archivo.read(), "5\n")
+        self.assertIn("Ingrese un entero: 120\n*** Ejecucion detenida", salida)
+
     def test_lineas_fuera_de_orden(self):
         texto = "20 end\n10 end"
         with self.assertRaises(ValueError):

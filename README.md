@@ -1,52 +1,126 @@
-# Simulador Simpletron (SML) y Profundidad de Anidamiento
+# Proyecto Simpletron, SML y lenguaje Simple
+
 **Autor:** Carlo Emilio Caballero Robles - 3515208
 
-## Descripción
-Proyecto de la materia de Programación Avanzada. Incluye un simulador funcional
-de la computadora virtual Simpletron (SML) capaz de ejecutar las 12 operaciones
-básicas, y un programa adicional que evalúa la profundidad de anidamiento en
-expresiones matemáticas mediante una pila.
+## Descripcion
 
-## Archivos del Proyecto
-1. `Simpletron-SML.py`: Simulador principal (memoria de 100 posiciones, ciclo fetch-decode-execute).
-2. `Anidamiento.py`: Evaluador de expresiones usando pila.
+Este proyecto contiene un simulador de Simpletron que ejecuta programas SML, herramientas para convertir y evaluar expresiones, y un compilador de programas Simple a SML. El simulador usa una memoria de 100 posiciones e incluye instrucciones aritmeticas, saltos, carga desde archivo y entrada y salida de cadenas.
 
-## Instrucciones de Ejecución:
+## Requisitos
 
+- Python 3.10 o posterior
+- No se necesitan librerias externas
 
+## Estructura
 
+```text
+README.md
+docs/
+  requerimientos.md
+  diseno.md
+src/
+  simpletron/simpletron.py
+  expresiones/anidamiento.py
+  expresiones/expresiones.py
+  compilador/compilador.py
+programas/
+  sml/
+  simple/
+pruebas/
+evidencias/
+```
 
-### Para el Simpletron:
-Ejecutar en la terminal:
+## Ejecutar Simpletron
 
-Ingresar las instrucciones SML línea por línea. Escribir `9999` para finalizar
-la carga y comenzar la ejecución. El programa detecta automáticamente
-desbordamientos, operaciones inválidas y divisiones entre cero, generando un
-volcado de memoria al finalizar.
+Para cargar un programa desde un archivo:
 
-### Para el Evaluador de Anidamiento:
-Ejecutar en la terminal:
+```bash
+python src/simpletron/simpletron.py programas/sml/modulo.sml
+```
 
+Tambien se puede ejecutar sin archivo y escribir las instrucciones cuando el programa las solicite:
 
-Ingresar una expresión (ej. `{a + [b * (c - d)]}`). El programa devolverá
-Verdadero (1) si está balanceada o Falso (0) si no lo está.
+```bash
+python src/simpletron/simpletron.py
+```
 
-## Casos de Prueba
+En el modo interactivo, escribe `9999` para terminar de cargar instrucciones y comenzar la ejecucion.
 
-### Caso 1: Ejecución correcta (suma de dos números)
-Programa cargado:
+Los archivos SML contienen una palabra numerica por linea. Se permiten lineas vacias y comentarios que comiencen despues de `;`.
 
-Entradas: `15` y `27` → Salida: `42`, seguido del volcado de registros y memoria.
+### Instrucciones SML
 
-Evidencia:
-![Caso 1 - Ejecución correcta](caso1_ejecucion_correcta.png)
+| Codigo | Operacion |
+|---:|---|
+| 10 | Leer entero |
+| 11 | Escribir entero |
+| 12 | Salto de linea |
+| 13 | Escribir cadena |
+| 14 | Leer cadena |
+| 20 | Cargar en el acumulador |
+| 21 | Guardar el acumulador |
+| 30 | Sumar |
+| 31 | Restar |
+| 32 | Dividir |
+| 33 | Multiplicar |
+| 34 | Residuo o modulo |
+| 35 | Potencia |
+| 40 | Salto incondicional |
+| 41 | Salto si es negativo |
+| 42 | Salto si es cero |
+| 43 | Detener |
 
+Los programas de ejemplo estan en `programas/sml/`.
 
-### Caso 2: Error fatal (división entre cero)
-Programa cargado:
+## Expresiones
 
-Entrada: `8` → El programa detecta la división entre cero, muestra el mensaje
-de error fatal y genera el volcado completo de registros y memoria.
+Ejecuta la herramienta interactiva:
 
-Evidencia:
-![Caso 2 - Error fatal](caso2_error_fatal.png)
+```bash
+python src/expresiones/expresiones.py
+```
+
+Convierte expresiones infijas a postfijas y evalua numeros enteros, variables, parentesis y los operadores `+`, `-`, `*`, `/` y `^`. La funcion de balanceo de parentesis, corchetes y llaves se conserva en `anidamiento.py`.
+
+## Lenguaje Simple y compilador
+
+El compilador recibe un archivo Simple y genera un archivo SML:
+
+```bash
+python src/compilador/compilador.py programas/simple/suma.simple programas/sml/compilados/suma.sml
+```
+
+Ejecuta el resultado en Simpletron:
+
+```bash
+python src/simpletron/simpletron.py programas/sml/compilados/suma.sml
+```
+
+El programa de suma pide dos enteros. Por ejemplo, con `8` y `9`, imprime `17`.
+
+Comandos disponibles en Simple:
+
+```text
+10 input a
+20 input b
+30 let c = a + b
+40 print c
+50 end
+```
+
+El compilador reconoce `rem`, `input`, `let`, `print`, `goto`, `if ... goto` y `end`. Las variables son letras minusculas individuales; los numeros de linea deben ir en orden ascendente.
+
+## Pruebas
+
+Desde la carpeta principal del proyecto:
+
+```bash
+python -B -m unittest discover -s pruebas -v
+```
+
+## Documentacion y evidencias
+
+- `docs/requerimientos.md`: resumen de los requisitos y componentes.
+- `docs/diseno.md`: decisiones de diseño y limites conocidos.
+- `evidencias/ejecuciones/`: capturas de ejecucion.
+- `evidencias/git-branch/`: capturas de ramas e historial Git.
