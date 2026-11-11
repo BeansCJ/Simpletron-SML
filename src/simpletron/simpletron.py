@@ -15,6 +15,8 @@ MAX_VALOR = 9999
 LEER = 10
 ESCRIBIR = 11
 SALTO_LINEA = 12
+ESCRIBIR_CADENA = 13
+LEER_CADENA = 14
 CARGAR = 20
 ALMACENAR = 21
 SUMAR = 30
@@ -22,6 +24,7 @@ RESTAR = 31
 DIVIDIR = 32
 MULTIPLICAR = 33
 MODULO = 34
+POTENCIA = 35
 BIFURCAR = 40
 BIFURCAR_NEGATIVO = 41
 BIFURCAR_CERO = 42
@@ -130,28 +133,29 @@ class Simpletron:
         """Ciclo principal de ejecucion fetch-decode-execute."""
         print("\n*** Inicio de la ejecucion del programa ***")
         while self.en_ejecucion:
-            # Verificamos que el contador apunte a una direccion valida
+    # Verificamos que el contador apunte a una direccion valida
             if self.instructionCounter < 0 or self.instructionCounter >= TAM_MEMORIA:
                 self._error_fatal("Direccion de instruccion invalida")
                 break
 
-            # Fetch: recuperamos instruccion de memoria
+      # Fetch: recuperamos instruccion de memoria
             self.instructionRegister = self.memoria[self.instructionCounter]
 
-            # Una instruccion negativa no es valida
+       # Una instruccion negativa no es valida
             if self.instructionRegister < 0:
                 self._error_fatal("Instruccion invalida (negativa)")
                 break
 
-            # Decode: decodificamos codigo y operando
+ # Decode: decodificamos codigo y operando
             self.operationCode = self.instructionRegister // 100
             self.operand = self.instructionRegister % 100
 
-            # El contador avanza a la siguiente instruccion
-            # (las bifurcaciones lo cambian despues)
+       # El contador avanza a la siguiente instruccion
+          # (las bifurcaciones lo cambian despues)
             self.instructionCounter += 1
 
-            # Execute: ejecutamos instruccion
+      
+       # Execute: ejecutamos instruccion
             self._ejecutar_instruccion()
 
     def _ejecutar_instruccion(self):
@@ -188,7 +192,7 @@ class Simpletron:
             if divisor == 0:
                 self._error_fatal("Intento de division entre cero")
             else:
-                # int() trunca hacia cero
+            # int() trunca hacia cero
                 self.accumulator = int(self.accumulator / divisor)
         elif op == BIFURCAR:
             self.instructionCounter = operando
@@ -206,6 +210,19 @@ class Simpletron:
                 self._error_fatal("Intento de modulo entre cero")
             else:
                 self.accumulator = self.accumulator - int(self.accumulator / divisor) * divisor
+        elif op == POTENCIA:
+            exponente = self.memoria[operando]
+            if exponente < 0:
+                self._error_fatal("Exponente negativo")
+            elif abs(self.accumulator) > 1 and exponente > 14:
+                self._error_fatal("Desbordamiento del acumulador")
+            else:
+                self.accumulator = self.accumulator ** exponente
+                self._verificar_desbordamiento()
+        elif op == ESCRIBIR_CADENA:
+            self._escribir_cadena()
+        elif op == LEER_CADENA:
+            self._leer_cadena()
         elif op == DETENER:
             print("*** Ejecucion detenida por Simpletron ***")
             self.en_ejecucion = False
@@ -216,11 +233,50 @@ class Simpletron:
         if self.accumulator < MIN_VALOR or self.accumulator > MAX_VALOR:
             self._error_fatal("Desbordamiento del acumulador")
 
+    def _escribir_cadena(self):
+        inicio = self.operand
+        longitud = self.memoria[inicio]
+        if longitud < 0 or inicio + longitud >= TAM_MEMORIA:
+            self._error_fatal("Cadena invalida en memoria")
+            return
+
+        texto = ""
+        for posicion in range(inicio + 1, inicio + longitud + 1):
+            codigo = self.memoria[posicion]
+            if codigo < 0:
+                self._error_fatal("Caracter invalido en la cadena")
+                return
+            texto += chr(codigo)
+
+        print(texto, end="")
+
+    def _leer_cadena(self):
+        texto = input("Ingrese una cadena: ")
+        inicio = self.operand
+        if inicio + len(texto) >= TAM_MEMORIA:
+            self._error_fatal("La cadena no cabe en la memoria")
+            return
+
+        for letra in texto:
+            if ord(letra) > MAX_VALOR:
+                self._error_fatal("Caracter fuera de rango")
+                return
+
+        self.memoria[inicio] = len(texto)
+        posicion = inicio + 1
+        for letra in texto:
+            self.memoria[posicion] = ord(letra)
+            posicion += 1
+
     def _error_fatal(self, mensaje):
         print(f"\n*** Error fatal: {mensaje} ***")
         print("*** Simpletron terminando la ejecucion ***")
         self.en_ejecucion = False
 
+
+
+
+#_______________________________________________________#
 def main():
     simulador = Simpletron()
     if len(sys.argv) > 1:
